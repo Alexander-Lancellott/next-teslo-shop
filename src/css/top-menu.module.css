@@ -1,0 +1,11 @@
+.circular-container {
+  @apply h-9 min-w-9 items-center justify-center rounded-full hover:bg-neutral;
+}
+
+.rectangular-container {
+  @apply m-2 rounded-md p-2 transition-all hover:bg-neutral;
+}
+
+.cart-number {
+  @apply absolute -right-2 -top-2 grid h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-content;
+}

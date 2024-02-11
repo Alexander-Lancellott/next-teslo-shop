@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
+
 import { useCartStore } from "@/store";
 import { currencyFormat } from "@/utils";
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from "react";
 
 export const OrderSummary = () => {
 

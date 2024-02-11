@@ -1,19 +1,26 @@
-"use server";
+'use server';
 
-import prisma from "@/lib/prisma";
-import { Gender } from "@prisma/client";
+import { revalidatePath } from 'next/cache';
+
+import { Gender } from '@prisma/client';
+
+import prisma from '@/lib/prisma';
 
 interface PaginationOptions {
   page?: number;
   take?: number;
   gender?: Gender;
+  term?: string;
 }
 
 export const getPaginatedProductsWithImages = async ({
   page = 1,
   take = 12,
+  term,
   gender,
 }: PaginationOptions) => {
+  if (term) term = term.toString().toLowerCase();
+
   if (isNaN(Number(page))) page = 1;
   if (page < 1) page = 1;
 
@@ -33,6 +40,7 @@ export const getPaginatedProductsWithImages = async ({
       //! Por género
       where: {
         gender: gender,
+        slug: { search: term },
       },
     });
 
@@ -41,9 +49,10 @@ export const getPaginatedProductsWithImages = async ({
     const totalCount = await prisma.product.count({
       where: {
         gender: gender,
+        slug: { search: term },
       },
     });
-    
+
     const totalPages = Math.ceil(totalCount / take);
 
     return {
@@ -55,6 +64,7 @@ export const getPaginatedProductsWithImages = async ({
       })),
     };
   } catch (error) {
-    throw new Error("No se pudo cargar los productos");
+    console.log(error);
+    throw new Error('No se pudo cargar los productos');
   }
 };

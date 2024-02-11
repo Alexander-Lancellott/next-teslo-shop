@@ -1,0 +1,22 @@
+.switch {
+  @apply relative flex h-[22px] w-[40px] cursor-pointer
+  items-center justify-start rounded-full bg-neutral p-[2px];
+}
+
+.switch[data-state='true'] {
+  @apply justify-end;
+}
+
+.handle {
+  @apply flex h-[20px] w-[20px] items-center justify-center
+  rounded-full bg-background-start text-primary-content shadow;
+}
+
+.tooltip {
+  @apply absolute top-12 whitespace-nowrap rounded border-2 border-opposite bg-opposite-neutral p-1 px-2
+  text-xs font-medium text-background-start opacity-0 transition-all;
+}
+
+.switch:hover ~ .tooltip {
+  @apply opacity-100 delay-1000;
+}

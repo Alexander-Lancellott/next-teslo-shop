@@ -1,8 +1,9 @@
-"use server";
-import prisma from "@/lib/prisma";
+'use server';
+import { Product } from '@prisma/client';
 
-import { auth } from "@/auth.config";
-import type { Address, Size } from "@/interfaces";
+import { auth } from '@/auth.config';
+import type { Address, Size } from '@/interfaces';
+import prisma from '@/lib/prisma';
 
 interface ProductToOrder {
   productId: string;
@@ -12,7 +13,7 @@ interface ProductToOrder {
 
 export const placeOrder = async (
   productIds: ProductToOrder[],
-  address: Address
+  address: Address,
 ) => {
   const session = await auth();
   const userId = session?.user.id;
@@ -21,7 +22,7 @@ export const placeOrder = async (
   if (!userId) {
     return {
       ok: false,
-      message: "No hay sesión de usuario",
+      message: 'No hay sesión de usuario',
     };
   }
 
@@ -42,7 +43,9 @@ export const placeOrder = async (
   const { subTotal, tax, total } = productIds.reduce(
     (totals, item) => {
       const productQuantity = item.quantity;
-      const product = products.find((product) => product.id === item.productId);
+      const product = products.find(
+        (product: Product) => product.id === item.productId,
+      );
 
       if (!product) throw new Error(`${item.productId} no existe - 500`);
 
@@ -54,12 +57,11 @@ export const placeOrder = async (
 
       return totals;
     },
-    { subTotal: 0, tax: 0, total: 0 }
+    { subTotal: 0, tax: 0, total: 0 },
   );
 
   // Crear la transacción de base de datos
   try {
-
     const prismaTx = await prisma.$transaction(async (tx) => {
       // 1. Actualizar el stock de los productos
       const updatedProductsPromises = products.map((product) => {
@@ -136,14 +138,11 @@ export const placeOrder = async (
       };
     });
 
-
     return {
       ok: true,
       order: prismaTx.order,
       prismaTx: prismaTx,
-    }
-
-
+    };
   } catch (error: any) {
     return {
       ok: false,

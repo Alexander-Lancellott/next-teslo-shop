@@ -1,10 +1,6 @@
-
 export * from './address/delete-user-address';
 export * from './address/get-user-address';
 export * from './address/set-user-address';
-
-
-
 
 export * from './auth/login';
 export * from './auth/logout';
@@ -22,13 +18,11 @@ export * from './order/get-orders-by-user';
 export * from './payments/set-transaction-id';
 export * from './payments/paypal-check-payment';
 
-
 export * from './product/delete-product-image';
 export * from './product/create-update-product';
 export * from './product/get-product-by-slug';
 export * from './product/get-stock-by-slug';
 export * from './product/product-pagination';
 
-
 export * from './user/change-user-role';
-export * from './user/get-paginater-users';
+export * from './user/get-paginated-users';
