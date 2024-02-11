@@ -1,8 +1,9 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
 import { auth } from '@/auth.config';
 import prisma from '@/lib/prisma';
-import { revalidatePath } from 'next/cache';
 
 
 export const changeUserRole = async( userId: string, role: string ) => {

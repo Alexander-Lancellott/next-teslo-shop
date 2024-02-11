@@ -1,6 +1,7 @@
-import type { CartProduct } from "@/interfaces";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+
+import type { CartProduct } from '@/interfaces';
 
 interface State {
   cart: CartProduct[];
@@ -36,13 +37,13 @@ export const useCartStore = create<State>()(
 
         const subTotal = cart.reduce(
           (subTotal, product) => product.quantity * product.price + subTotal,
-          0
+          0,
         );
         const tax = subTotal * 0.15;
         const total = subTotal + tax;
         const itemsInCart = cart.reduce(
           (total, item) => total + item.quantity,
-          0
+          0,
         );
 
         return {
@@ -58,7 +59,7 @@ export const useCartStore = create<State>()(
 
         // 1. Revisar si el producto existe en el carrito con la talla seleccionada
         const productInCart = cart.some(
-          (item) => item.id === product.id && item.size === product.size
+          (item) => item.id === product.id && item.size === product.size,
         );
 
         if (!productInCart) {
@@ -94,7 +95,7 @@ export const useCartStore = create<State>()(
       removeProduct: (product: CartProduct) => {
         const { cart } = get();
         const updatedCartProducts = cart.filter(
-          (item) => item.id !== product.id || item.size !== product.size
+          (item) => item.id !== product.id || item.size !== product.size,
         );
 
         set({ cart: updatedCartProducts });
@@ -106,7 +107,7 @@ export const useCartStore = create<State>()(
     }),
 
     {
-      name: "shopping-cart",
-    }
-  )
+      name: 'shopping-cart',
+    },
+  ),
 );

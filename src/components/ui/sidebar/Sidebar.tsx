@@ -1,146 +1,137 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import clsx from "clsx";
-import { useSession } from "next-auth/react";
-import {
-  IoCloseOutline,
-  IoLogInOutline,
-  IoLogOutOutline,
-  IoPeopleOutline,
-  IoPersonOutline,
-  IoSearchOutline,
-  IoShirtOutline,
-  IoTicketOutline,
-} from "react-icons/io5";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import clsx from 'clsx';
+import { IoCloseOutline, IoSearchOutline } from 'react-icons/io5';
 
-import { useUIStore } from "@/store";
-import { logout } from "@/actions";
+import { logout } from '@/actions';
+import { titleFont } from '@/config/fonts';
+import { useSearchStore, useUIStore } from '@/store';
+import placeholder from '../../../../public/imgs/placeholder.jpg';
+import { ListItems } from './ListItems';
+
+import styles from '@/css/sidebar.module.css';
 
 export const Sidebar = () => {
+  const { push } = useRouter();
   const isSideMenuOpen = useUIStore((state) => state.isSideMenuOpen);
+  const { searchTerm, setSearchTerm } = useSearchStore();
   const closeMenu = useUIStore((state) => state.closeSideMenu);
 
   const { data: session } = useSession();
   const isAuthenticated = !!session?.user;
-  const isAdmin = session?.user.role === "admin";
+  const isAdmin = session?.user.role === 'admin';
+
+  const onSearchTerm = () => {
+    if (searchTerm.trim().length < 3) return;
+    closeMenu();
+    push(`/search/${searchTerm}`);
+  };
+
+  const navStyle = clsx(
+    `fixed right-0 top-0 z-20 h-screen w-[400px] transform bg-gradient-theme p-5
+      shadow-2xl transition-all duration-300`,
+    {
+      'translate-x-full': !isSideMenuOpen,
+    },
+  );
 
   return (
     <div>
       {/* Background black */}
       {isSideMenuOpen && (
-        <div className="fixed top-0 left-0 w-screen h-screen z-10 bg-black opacity-30" />
+        <div className="fixed left-0 top-0 z-10 h-screen w-screen bg-black opacity-30" />
       )}
 
       {/* Blur */}
       {isSideMenuOpen && (
         <div
           onClick={closeMenu}
-          className="fade-in fixed top-0 left-0 w-screen h-screen z-10 backdrop-filter backdrop-blur-sm"
+          className="fade-in fixed left-0 top-0 z-10 h-screen w-screen backdrop-blur-sm
+            backdrop-filter"
         />
       )}
 
       {/* Sidemenu */}
-      <nav
-        className={clsx(
-          "fixed p-5 right-0 top-0 w-[500px] h-screen bg-white z-20 shadow-2xl transform transition-all duration-300",
-          {
-            "translate-x-full": !isSideMenuOpen,
-          }
+      <nav className={navStyle}>
+        {session?.user && (
+          <div className="flex">
+            <figure className="relative h-24 w-24">
+              <Image
+                src={session.user.image ?? placeholder}
+                alt="user-image"
+                sizes="(max-width: 768px) 100vw"
+                fill
+                className="rounded-full"
+              />
+            </figure>
+            <div className="ml-4 flex w-56 flex-col justify-between py-4">
+              <h1 className={`${titleFont.className} truncate text-xl`}>
+                {session?.user.name}
+              </h1>
+              <div
+                className="w-full rounded bg-primary text-center opacity-70 transition-all
+                  hover:opacity-100"
+              >
+                <Link
+                  href="/profile"
+                  className="ml-2 font-medium"
+                  onClick={closeMenu}
+                >
+                  Editar perfil
+                </Link>
+              </div>
+            </div>
+          </div>
         )}
-      >
-        <IoCloseOutline
-          size={50}
-          className="absolute top-5 right-5 cursor-pointer"
-          onClick={() => closeMenu()}
-        />
 
         {/* Input */}
-        <div className="relative mt-14">
-          <IoSearchOutline size={20} className="absolute top-2 left-2" />
+        <div
+          className="relative mt-6 flex w-full items-center rounded-md border-b-2 border-neutral
+            bg-secondary px-3 py-2 focus-within:border-primary sm:hidden"
+        >
+          <button onClick={onSearchTerm}>
+            <IoSearchOutline size={20} />
+          </button>
           <input
             type="text"
-            placeholder="Buscar"
-            className="w-full bg-gray-50 rounded pl-10 py-1 pr-10 border-b-2 text-xl border-gray-200 focus:outline-none focus:border-blue-500"
+            placeholder="Buscar..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyUp={(e) => (e.key === 'Enter' ? onSearchTerm() : null)}
+            className="ml-2 w-full bg-transparent outline-none"
           />
+          <button
+            onClick={() => setSearchTerm('')}
+            className={clsx('fade-in', {
+              hidden: searchTerm.length < 3,
+            })}
+          >
+            <IoCloseOutline size={20} />
+          </button>
         </div>
 
         {/* Menú */}
 
         {isAuthenticated && (
-          <>
-            <Link
-              href="/profile"
-              onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoPersonOutline size={30} />
-              <span className="ml-3 text-xl">Perfil</span>
-            </Link>
-
-            <Link
-              href="/orders"
-              onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoTicketOutline size={30} />
-              <span className="ml-3 text-xl">Ordenes</span>
-            </Link>
-          </>
+          <ListItems
+            type="authenticated"
+            closeMenu={closeMenu}
+            logout={logout}
+          />
         )}
 
-        {isAuthenticated && (
-          <button
-            className="flex w-full items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            onClick={() => logout()}
-          >
-            <IoLogOutOutline size={30} />
-            <span className="ml-3 text-xl">Salir</span>
-          </button>
-        )}
-
-        {!isAuthenticated && (
-          <Link
-            href="/auth/login"
-            className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            onClick={() => closeMenu()}
-          >
-            <IoLogInOutline size={30} />
-            <span className="ml-3 text-xl">Ingresar</span>
-          </Link>
-        )}
+        {!isAuthenticated && <ListItems type="login" closeMenu={closeMenu} />}
 
         {isAdmin && (
           <>
             {/* Line Separator */}
-            <div className="w-full h-px bg-gray-200 my-10" />
+            <div className="my-10 h-px w-full bg-gray-200" />
 
-            <Link
-              href="/admin/products"
-              onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoShirtOutline size={30} />
-              <span className="ml-3 text-xl">Productos</span>
-            </Link>
-
-            <Link
-              href="/admin/orders"
-              onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoTicketOutline size={30} />
-              <span className="ml-3 text-xl">Ordenes</span>
-            </Link>
-
-            <Link
-              href="/admin/users"
-              onClick={() => closeMenu()}
-              className="flex items-center mt-10 p-2 hover:bg-gray-100 rounded transition-all"
-            >
-              <IoPeopleOutline size={30} />
-              <span className="ml-3 text-xl">Usuarios</span>
-            </Link>
+            <ListItems type="admin" closeMenu={closeMenu} />
           </>
         )}
       </nav>

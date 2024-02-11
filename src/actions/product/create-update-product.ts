@@ -1,10 +1,12 @@
 'use server';
 
-import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { Gender, Product, Size } from '@prisma/client';
-import { z } from 'zod';
 import {v2 as cloudinary} from 'cloudinary';
+import { z } from 'zod';
+
+import { Gender, Product, Size } from '@prisma/client';
+
+import prisma from '@/lib/prisma';
 cloudinary.config( process.env.CLOUDINARY_URL ?? '' );
 
 

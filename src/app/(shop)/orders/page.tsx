@@ -1,49 +1,61 @@
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 // https://tailwindcomponents.com/component/hoverable-table
-import { getOrdersByUser } from "@/actions";
-import { Title } from "@/components";
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { IoCardOutline } from 'react-icons/io5';
 
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { IoCardOutline } from "react-icons/io5";
+import { getOrdersByUser } from '@/actions';
+import { Pagination, Title } from '@/components';
 
-export default async function OrdersPage() {
-  const { ok, orders = [] } = await getOrdersByUser();
+interface Props {
+  searchParams: {
+    page?: string;
+  };
+}
+
+export default async function OrdersPage({ searchParams }: Props) {
+  const page = searchParams.page ? parseInt(searchParams.page) : 1;
+
+  const {
+    ok,
+    orders = [],
+    totalPages = 1,
+  } = await getOrdersByUser({ page, take: 11 });
 
   if (!ok) {
-    redirect("/auth/login");
+    redirect('/auth/login');
   }
 
   return (
-    <>
+    <div className="min-h-[calc(100svh-105px)]">
       <Title title="Orders" />
 
       <div className="mb-10">
         <table className="min-w-full">
-          <thead className="bg-gray-200 border-b">
+          <thead className="bg-neutral">
             <tr>
               <th
                 scope="col"
-                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                className="px-6 py-4 text-left text-sm font-medium"
               >
                 #ID
               </th>
               <th
                 scope="col"
-                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                className="px-6 py-4 text-left text-sm font-medium"
               >
                 Nombre completo
               </th>
               <th
                 scope="col"
-                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                className="px-6 py-4 text-left text-sm font-medium"
               >
                 Estado
               </th>
               <th
                 scope="col"
-                className="text-sm font-medium text-gray-900 px-6 py-4 text-left"
+                className="px-6 py-4 text-left text-sm font-medium"
               >
                 Opciones
               </th>
@@ -53,15 +65,16 @@ export default async function OrdersPage() {
             {orders.map((order) => (
               <tr
                 key={order.id}
-                className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
+                className="border-b border-neutral bg-background-start transition duration-300 ease-in-out
+                  hover:bg-secondary"
               >
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {order.id.split("-").at(-1)}
+                <td className="whitespace-nowrap px-6 py-4 text-sm font-medium">
+                  {order.id.split('-').at(-1)}
                 </td>
-                <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                <td className="whitespace-nowrap px-6 py-4 text-sm font-light">
                   {order.OrderAddress?.firstName} {order.OrderAddress?.lastName}
                 </td>
-                <td className="flex items-center text-sm  text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                <td className="flex items-center whitespace-nowrap px-6 py-4 text-sm font-light">
                   {order.isPaid ? (
                     <>
                       <IoCardOutline className="text-green-800" />
@@ -74,18 +87,20 @@ export default async function OrdersPage() {
                     </>
                   )}
                 </td>
-                <td className="text-sm text-gray-900 font-light px-6 ">
-                  <Link href={`/orders/${ order.id }`} className="hover:underline">
+                <td className="px-6 text-sm font-light">
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="hover:underline"
+                  >
                     Ver orden
                   </Link>
                 </td>
               </tr>
             ))}
-
-            
           </tbody>
         </table>
+        {totalPages > 1 && <Pagination totalPages={totalPages} />}
       </div>
-    </>
+    </div>
   );
 }

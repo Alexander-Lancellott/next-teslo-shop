@@ -31,10 +31,10 @@ https://
 ## Getting started
 
 ```
-1. $ yarn install
+1. $ pnpm install
 2. $ docker-compose up -d
-3. $ npx prisma generate
-4. $ npx prisma migrate dev
+3. $ pnpm dlx prisma generate
+4. $ pnpm dlx prisma migrate dev
 ```
 
 > [!IMPORTANT]
@@ -42,6 +42,9 @@ https://
 
 > [!NOTE]
 > Execute `yarn seed` to populate the database with information.
+
+> [!NOTE]
+> For type definition on CSS Modules, [use the workspace version of TypeScript](https://code.visualstudio.com/docs/typescript/typescript-compiling#_using-the-workspace-version-of-typescript).
 
 ## Launch APP
 

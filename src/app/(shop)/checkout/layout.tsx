@@ -1,5 +1,6 @@
-import { auth } from '@/auth.config';
 import { redirect } from 'next/navigation';
+
+import { auth } from '@/auth.config';
 
 export default async function CheckoutLayout({children}: {
  children: React.ReactNode;

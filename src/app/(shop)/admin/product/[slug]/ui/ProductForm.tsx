@@ -1,12 +1,13 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { Category, Product, ProductImage as ProductWithImage } from "@/interfaces";
 import Image from "next/image";
-import clsx from "clsx";
-import { createUpdateProduct, deleteProductImage } from "@/actions";
 import { useRouter } from 'next/navigation';
+import clsx from "clsx";
+import { useForm } from "react-hook-form";
+
+import { createUpdateProduct, deleteProductImage } from "@/actions";
 import { ProductImage } from '@/components';
+import { Category, Product, ProductImage as ProductWithImage } from "@/interfaces";
 
 interface Props {
   product: Partial<Product> & { ProductImage?: ProductWithImage[] };
